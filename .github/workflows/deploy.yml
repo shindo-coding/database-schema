@@ -1,0 +1,63 @@
+name: Kubernetes deploy
+
+on:
+  workflow_run:
+    workflows: ["CI/CD Pipeline"]
+    types:
+      - completed
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+
+    env:
+      CI_REGISTRY_IMAGE: shindo806/database-migrator
+      PROJECT_NAME: database-migrator
+      EXPOSE_PORT: 80
+      MEM_MIN: 128Mi
+      CPU_MIN: 250m
+      MEM_MAX: 256Mi
+      CPU_MAX: 500m
+      SCALE_MIN: 1
+      SCALE_MAX: 1
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Fetch Docker Tags
+        id: fetch-latest-tag
+        run: |
+          # Fetch the JSON response from the Docker Hub
+          response=$(curl -s "https://registry.hub.docker.com/v2/repositories/shindo806/${PROJECT_NAME}/tags")
+
+          # Extract the tag names using jq
+          tag=$(echo "$response" | jq -r '.results[0].name')
+
+          # Print tags (for debugging purposes)
+          echo "Tags:"
+          echo "$tag"
+
+          # Set the tags as an output
+          echo "DOCKER_TAG=$tag" >> ${GITHUB_OUTPUT}
+
+      - name: Substitute environment variables in template
+        env:
+          DOCKER_TAG: ${{ steps.fetch-latest-tag.outputs.DOCKER_TAG }}
+        run: |
+          envsubst < template.yml > deployment.yml
+          envsubst < hpa_template.yml > hpa.yml
+        shell: bash
+
+      - name: Deploy to Kubernetes
+        env:
+          DOCKER_TAG: ${{ steps.fetch-latest-tag.outputs.DOCKER_TAG }}
+        run: |
+          cat deployment.yml
+          cat hpa.yml
+          minikube kubectl -- apply -f deployment.yml
+          minikube kubectl -- apply -f hpa.yml
+          minikube kubectl -- rollout status deploy/$PROJECT_NAME
+        shell: bash

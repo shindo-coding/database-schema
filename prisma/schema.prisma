@@ -15,14 +15,15 @@ datasource db {
 
 model StockWatchlist {
   id Int @id @default(autoincrement())
-  code String @unique
+  code String
   lowerPrice Float?
   upperPrice Float?
   createdAt  DateTime   @default(now())
 }
 
 model WatchlistNotification {
-  code String @unique
+  id Int @id @default(autoincrement())
+  code String
   isSent Boolean
   createdAt  DateTime   @default(now())
 }
@@ -58,14 +59,14 @@ model VolumeWatchlist {
   id Int @id @default(autoincrement())
   createdAt  DateTime   @default(now())
 
-  code String @unique
+  code String
 }
 
 model VolumeWatchlistNotificationDaily {
   id Int @id @default(autoincrement())
   createdAt  DateTime   @default(now())
 
-  code String @unique
+  code String
   price BigInt @default(0)
   volume BigInt @default(0)
   totalDealValue BigInt @default(0)
@@ -79,7 +80,7 @@ model VolumeWatchlistNotificationRealtime {
   id Int @id @default(autoincrement())
   createdAt  DateTime   @default(now())
 
-  code String @unique
+  code String
   price BigInt @default(0)
   volume BigInt @default(0)
   totalDealValue BigInt @default(0)
@@ -95,7 +96,7 @@ model PriceWatchlistNotificationRealtime {
   id Int @id @default(autoincrement())
   createdAt  DateTime   @default(now())
 
-  code String @unique
+  code String
   price BigInt @default(0)
   volume BigInt @default(0)
   totalDealValue BigInt @default(0)
@@ -160,12 +161,11 @@ model Investor {
 
 model TickerSuggestion {
   id Int @id @default(autoincrement())
-  code String @unique
+  code String
   userId String
   postId String?
   createdAt  DateTime   @default(now())
   isNotificationSent Boolean @default(false)
 
   @@index(fields: [code, userId])
-  @@unique([code, postId, userId])
 }

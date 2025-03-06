@@ -116,9 +116,9 @@ model HistoricalData {
   dealVolume Int
   putthroughVolume Int
   putthroughValue Int
-  propTradingNetDealValue Int
-  propTradingNetPTValue Int
-  propTradingNetValue Int
+  propTradingNetDealValue Int @default(0)
+  propTradingNetPTValue Int @default(0)
+  propTradingNetValue Int @default(0)
   unit Int
 
   priceHigh Float
@@ -128,13 +128,13 @@ model HistoricalData {
   priceClose Float
   priceBasic Float
   adjRatio Float
-  sellForeignValue Float
-  buyForeignValue Float
+  sellForeignValue Float @default(0)
+  buyForeignValue Float @default(0)
 
-  currentForeignRoom BigInt
+  currentForeignRoom BigInt @default(0)
   totalValue BigInt
-  buyForeignQuantity BigInt
-  sellForeignQuantity BigInt
+  buyForeignQuantity BigInt @default(0)
+  sellForeignQuantity BigInt @default(0)
   buyCount BigInt
   buyQuantity BigInt
   sellCount BigInt

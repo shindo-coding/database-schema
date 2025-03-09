@@ -110,7 +110,7 @@ model PriceWatchlistNotificationRealtime {
 
 model HistoricalData {
   id Int @id @default(autoincrement())
-  date DateTime
+  date String
   symbol String
   totalVolume Int
   dealVolume Int
